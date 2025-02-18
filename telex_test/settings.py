@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -144,4 +144,4 @@ SPECTACULAR_SETTINGS = {
 
 JIRA_DOMAIN = 'kodiugos.atlassian.net'
 JIRA_EMAIL = 'kodiugos@gmail.com'
-JIRA_API_TOKEN = 'ATATT3xFfGF0q7QlXnRBXwzt-cRd5LbKMeedMAHag9qA8GMH_urYZIlB0mE8iL8DothPxHTzM0n-sTAFxDvh2rnmKfxkcRkl6DqfHFJtMTGwfsMi1PpkYLPJD7I6LMWrwzh4ZgELxDfFBcTvVdPvRgrIgM27DsFaebjyVteuLFveJmPIKgGKIfk=58D47C1A'
+JIRA_API_TOKEN = os.getenv("JIRA_API_TOKEN")
