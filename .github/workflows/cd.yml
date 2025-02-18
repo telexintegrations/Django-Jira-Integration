@@ -1,0 +1,42 @@
+name: CD pipline
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Deploy via SSH
+      - uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key:  ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Navigate to project directory
+            cd Telex-test/
+            
+            git pull origin
+            
+            source venv/bin/activate
+            pip install -r requirements.txt
+            
+            # Run migrations
+            python manage.py migrate
+            
+            # Collect static files
+            python manage.py collectstatic --noinput
+            
+            # Restart Gunicorn
+            sudo systemctl restart gunicorn
+            
+            # Restart nginx 
+            sudo systemctl reload nginx
+
+
+
