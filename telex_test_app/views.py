@@ -91,8 +91,15 @@ class JiraReportAPIView(generics.GenericAPIView):
                     "workload_index": jira_reporter.calculate_workload_index(pending_count, resolved_count)
                 }
             }
+            data = {
+                'message': response_data,
+                'username': 'Django-Jira Integration',
+                'event_name': 'Telex-Integration',
+                'status': 'success'
+            }
 
-            return Response(response_data, status=200)
+
+            return Response(data, status=200)
 
         except requests.exceptions.RequestException as e:
             return Response(
