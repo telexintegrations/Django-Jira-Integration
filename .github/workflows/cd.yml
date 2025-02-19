@@ -4,7 +4,6 @@ on:
   push:
     branches: [ master ]
 
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -19,26 +18,85 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key:  ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Navigate to project directory
-            cd Telex-test/
+            # Setup logging
+            LOGFILE="/home/${{ secrets.SSH_USERNAME }}/deployment_$(date +%Y%m%d_%H%M%S).log"
+            exec > >(tee -a $LOGFILE) 2>&1
+            echo "Starting deployment at $(date)"
             
-            git pull origin master
+            # Create and set up project directory
+            echo "Setting up project directory..."
+            sudo mkdir -p /home/${{ secrets.SSH_USERNAME }}
+            sudo chown ${{ secrets.SSH_USERNAME }}:${{ secrets.SSH_USERNAME }} /home/${{ secrets.SSH_USERNAME }}
+            
+            # Update package index and install dependencies
+            echo "Updating system packages..."
+            sudo apt-get update -y || { echo "Failed to update packages"; exit 1; }
+            sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common || { echo "Failed to install dependencies"; exit 1; }
+            
+            # Handle repository deployment
+            cd /home/${{ secrets.SSH_USERNAME }}
+            
+            # Clone repository if it doesn't exist
+            if [ ! -d "Telex-test" ]; then
+                echo "First deployment - cloning repository..."
+                git clone https://github.com/Benji918/Telex-test.git || { echo "Failed to clone repository"; exit 1; }
+            fi
+            
+            cd Telex-test/
+            echo "Updating code from repository..."
+            git fetch origin master
             git reset --hard origin/master
             
-            source venv/bin/activate
-            pip install -r requirements.txt
+            # Check if virtual environment exists, create if it doesn't
+            if [ ! -d "venv" ]; then
+                echo "Creating virtual environment..."
+                python3 -m venv venv || { echo "Failed to create virtual environment"; exit 1; }
+            fi
+            
+            # Check if Gunicorn service exists
+            if ! systemctl list-unit-files | grep -q gunicorn; then
+                echo "WARNING: Gunicorn service doesn't appear to be configured. Setup instructions:"
+                echo "1. Create a gunicorn.service file in /etc/systemd/system/"
+                echo "2. Configure it to run your Django application"
+                echo "3. Enable with: sudo systemctl enable gunicorn"
+            fi
+            
+            # Check if Nginx is installed
+            if ! command -v nginx &> /dev/null; then
+                echo "WARNING: Nginx doesn't appear to be installed. Install with:"
+                echo "sudo apt-get install nginx"
+                echo "Then configure it to proxy to your Gunicorn service"
+            fi
+            
+            echo "Activating virtual environment..."
+            source venv/bin/activate || { echo "Failed to activate virtual environment"; exit 1; }
+            
+            echo "Installing Python dependencies..."
+            pip install -r requirements.txt || { echo "Failed to install Python requirements"; exit 1; }
             
             # Run migrations
-            python manage.py migrate
+            echo "Running database migrations..."
+            python manage.py migrate || { echo "Failed to run migrations"; exit 1; }
             
             # Collect static files
-            python manage.py collectstatic --noinput
+            echo "Collecting static files..."
+            python manage.py collectstatic --noinput || { echo "Failed to collect static files"; exit 1; }
             
-            # Restart Gunicorn
-            sudo systemctl restart gunicorn
+            # Restart Gunicorn if it exists
+            if systemctl list-unit-files | grep -q gunicorn; then
+                echo "Restarting Gunicorn..."
+                sudo systemctl restart gunicorn || { echo "Failed to restart Gunicorn"; exit 1; }
+            else
+                echo "WARNING: Skipping Gunicorn restart as service doesn't exist"
+            fi
             
-            # Restart nginx 
-            sudo systemctl reload nginx
-
-
-
+            # Reload Nginx if it exists
+            if command -v nginx &> /dev/null; then
+                echo "Reloading Nginx..."
+                sudo systemctl reload nginx || { echo "Failed to reload Nginx"; exit 1; }
+            else
+                echo "WARNING: Skipping Nginx reload as it doesn't appear to be installed"
+            fi
+            
+            echo "Deployment completed successfully at $(date)"
+            echo "Deployment log saved to $LOGFILE"
