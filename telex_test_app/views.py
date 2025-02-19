@@ -53,7 +53,7 @@ class TelexAPITest(generics.GenericAPIView):
 class JiraReportAPIView(generics.GenericAPIView):
 
     def get(self, request, *args,  **kwargs,):
-        jira_reporter = JiraReports(domain=settings.JIRA_DOMAIN, email=settings.JIRA_EMAIL, api_token=settings.JIRA_API_TOKEN)
+        jira_reporter = JiraReports(domain=settings.JIRA_DOMAIN, email=settings.JIRA_EMAIL, api_token='ATATT3xFfGF059PYzW7I1qPdY13jeh89F1T3VQQgwA9_BDuDPXw4eX8BMXI8Pl_J5SHkCtZHyi43lp4KaqE6KXCIJH86PBAoggjiwRFSYpG4uA7HpUsaZNMoXtptauqhhAw6MH7zJczRCwqf3uipoVQqzjZ47WQkNRLL2dH5kGhPi5jBc1YVo6U=865F5695')
         try:
             issues = jira_reporter.get_weekly_issues()
             # print(issues)
