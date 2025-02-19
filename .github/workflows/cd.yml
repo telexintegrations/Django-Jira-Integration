@@ -48,6 +48,10 @@ jobs:
             git fetch origin master
             git reset --hard origin/master
             
+             # Stop any existing Gunicorn processes so the new code is picked up
+            echo "Stopping existing Gunicorn processes (if any)..."
+            pkill gunicorn || echo "No Gunicorn process found."
+            
             # Check if virtual environment exists, create if it doesn't
             if [ -d "venv" ]; then
             echo "Removing existing virtual environment..."
