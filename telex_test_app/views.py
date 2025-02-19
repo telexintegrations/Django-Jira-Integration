@@ -41,7 +41,7 @@ class TelexAPITest(generics.GenericAPIView):
         "default": "True"
       }
     ],
-    "target_url": "",
+    "target_url": "nnnnmm",
     "tick_url": "http://40.83.174.214/jira-report"
   }
 }
