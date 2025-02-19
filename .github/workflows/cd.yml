@@ -33,6 +33,7 @@ jobs:
             sudo apt-get update -y || { echo "Failed to update packages"; exit 1; }
             sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common || { echo "Failed to install dependencies"; exit 1; }
             
+            
             # Handle repository deployment
             cd /home/${{ secrets.SSH_USERNAME }}
             
@@ -50,6 +51,8 @@ jobs:
             # Check if virtual environment exists, create if it doesn't
             if [ ! -d "venv" ]; then
                 echo "Creating virtual environment..."
+                # First, make sure python3-venv is installed
+                sudo apt-get install -y python3.10-venv || { echo "Failed to install python3.10-venv"; exit 1; }
                 python3 -m venv venv || { echo "Failed to create virtual environment"; exit 1; }
             fi
             
