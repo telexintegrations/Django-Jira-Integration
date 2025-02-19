@@ -21,7 +21,7 @@ class TelexAPITest(generics.GenericAPIView):
       "app_url": "http://40.83.174.214/",
       "background_color": "#fff"
     },
-    "is_active": true,
+    "is_active": 'true',
     "integration_category": "Monitoring & Logging",
     "integration_type": "interval",
     "key_features": [
@@ -33,13 +33,13 @@ class TelexAPITest(generics.GenericAPIView):
       {
         "label": "Interval",
         "type": "text",
-        "required": true,
+        "required": 'true',
         "default": "*/3 * * * * *"  #schedule it for Saturday night at 11:59 PM(59 23 * * 6).
       },
       {
         "label": "include-logs",
         "type": "checkbox",
-        "required": true,
+        "required": 'true',
         "default": "True"
       }
     ],
