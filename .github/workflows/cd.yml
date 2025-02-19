@@ -49,13 +49,16 @@ jobs:
             git reset --hard origin/master
             
             # Check if virtual environment exists, create if it doesn't
-            if [ ! -d "venv" ]; then
-                echo "Creating virtual environment..."
-                # First, make sure python3-venv is installed
-                sudo apt-get install -y python3-venv || { echo "Failed to install python3.10-venv"; exit 1; }
-                python3 -m venv venv || { echo "Failed to create virtual environment"; exit 1; }
+           if [ -d "venv" ]; then
+            echo "Removing existing virtual environment..."
+            rm -rf venv
             fi
-          
+            
+            echo "Creating virtual environment..."
+            # Install Python 3.10 venv if not already installed
+            sudo apt-get install -y python3.10-venv || { echo "Failed to install python3.10-venv"; exit 1; }
+            # Use python3.10 explicitly to create the virtual environment
+            python3.10 -m venv venv || { echo "Failed to create virtual environment"; exit 1; }
             
             echo "Activating virtual environment..."
             source venv/bin/activate || { echo "Failed to activate virtual environment"; exit 1; }
