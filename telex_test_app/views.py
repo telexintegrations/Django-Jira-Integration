@@ -32,7 +32,7 @@ class TelexAPITest(generics.GenericAPIView):
         "label": "Interval",
         "type": "text",
         "required": True,
-        "default": "59 23 * * 6" #schedule it for Saturday night at 11:59PM.
+        "default": "59 23 * * 6" #schedule it for Saturday night at 11:59 PM(59 23 * * 6).
       },
       {
         "label": "include-logs",
@@ -41,7 +41,7 @@ class TelexAPITest(generics.GenericAPIView):
         "default": "True"
       }
     ],
-    "target_url": "https://hooks.slack.com/services/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",
+    "target_url": "",
     "tick_url": "http://40.83.174.214/jira-report"
   }
 }
@@ -60,6 +60,7 @@ class JiraReportAPIView(generics.GenericAPIView):
             # Calculate counts
             pending_count = len(issues["pending"])
             resolved_count = len(issues['resolved'])
+
 
             # Calculate priority distribution
             priority_counts = {"pending": {}, "resolved": {}}

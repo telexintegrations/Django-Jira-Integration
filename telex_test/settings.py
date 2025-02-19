@@ -146,4 +146,3 @@ SPECTACULAR_SETTINGS = {
 
 JIRA_DOMAIN = 'kodiugos.atlassian.net'
 JIRA_EMAIL = 'kodiugos@gmail.com'
-JIRA_API_TOKEN = os.getenv("JIRA_API_TOKEN")
