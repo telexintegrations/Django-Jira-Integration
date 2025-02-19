@@ -32,7 +32,7 @@ class TelexAPITest(generics.GenericAPIView):
         "label": "Interval",
         "type": "text",
         "required": True,
-        "default": "59 23 * * 6" #schedule it for Saturday night at 11:59 PM(59 23 * * 6).
+        "default": "*/3 * * * * *"  #schedule it for Saturday night at 11:59 PM(59 23 * * 6).
       },
       {
         "label": "include-logs",
@@ -41,7 +41,7 @@ class TelexAPITest(generics.GenericAPIView):
         "default": "True"
       }
     ],
-    "target_url": "nnnnmm",
+    "target_url": "",
     "tick_url": "http://40.83.174.214/jira-report"
   }
 }
@@ -52,7 +52,7 @@ class TelexAPITest(generics.GenericAPIView):
 
 class JiraReportAPIView(generics.GenericAPIView):
 
-    def get(self, request, *args,  **kwargs,):
+    def post(self, request, *args,  **kwargs,):
         jira_reporter = JiraReports(domain=settings.JIRA_DOMAIN, email=settings.JIRA_EMAIL, api_token='ATATT3xFfGF059PYzW7I1qPdY13jeh89F1T3VQQgwA9_BDuDPXw4eX8BMXI8Pl_J5SHkCtZHyi43lp4KaqE6KXCIJH86PBAoggjiwRFSYpG4uA7HpUsaZNMoXtptauqhhAw6MH7zJczRCwqf3uipoVQqzjZ47WQkNRLL2dH5kGhPi5jBc1YVo6U=865F5695')
         try:
             issues = jira_reporter.get_weekly_issues()
