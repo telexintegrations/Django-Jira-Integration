@@ -83,9 +83,7 @@ jobs:
             # Collect static files
             echo "Collecting static files..."
             python manage.py collectstatic --noinput || { echo "Failed to collect static files"; exit 1; }
-            
-            echo "Exporting JIRA-API-TOKEN"
-            export JIRA_API_TOKEN=${{ secrets.JIRA_API_TOKEN }}
+          
             
             echo "Deployment completed successfully at $(date)"
             echo "Deployment log saved to $LOGFILE"
