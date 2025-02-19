@@ -90,4 +90,3 @@ jobs:
           
             
             echo "Deployment completed successfully at $(date)"
-            echo "Deployment log saved to $LOGFILE"
