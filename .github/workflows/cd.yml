@@ -21,7 +21,8 @@ jobs:
             # Navigate to project directory
             cd Telex-test/
             
-            git pull origin
+            git pull origin master
+            git reset --hard origin/master
             
             source venv/bin/activate
             pip install -r requirements.txt
