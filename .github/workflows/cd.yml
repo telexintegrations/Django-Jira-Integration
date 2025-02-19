@@ -66,9 +66,19 @@ jobs:
             echo "Installing Python dependencies..."
             pip install -r requirements.txt || { echo "Failed to install Python requirements"; exit 1; }
             
-            # Run migrations
-            echo "Running database migrations..."
-            python manage.py migrate || { echo "Failed to run migrations"; exit 1; }
+             # Install Nginx
+            sudo apt-get install -y nginx || { echo "Failed to install nginx"; exit 1; }
+            
+            # Copy your pre-existing nginx.conf from the repository to the proper location
+            echo "Copying Nginx configuration..."
+            sudo cp $(pwd)/nginx.conf /etc/nginx/sites-available/telex || { echo "Failed to copy nginx.conf"; exit 1; }
+            sudo ln -sf /etc/nginx/sites-available/telex /etc/nginx/sites-enabled/
+            sudo nginx -t || { echo "Nginx configuration test failed"; exit 1; }
+            sudo systemctl restart nginx || { echo "Failed to restart nginx"; exit 1; }
+            
+            # Start Gunicorn server in the background
+            echo "Starting Gunicorn server..."
+            nohup gunicorn telex_test.wsgi:application --bind 127.0.0.1:8000 --workers 3 > gunicorn.log 2>&1 &
             
             # Collect static files
             echo "Collecting static files..."
