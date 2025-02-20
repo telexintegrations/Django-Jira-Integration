@@ -72,6 +72,13 @@ jobs:
             echo "Installing Python dependencies..."
             pip install -r requirements.txt || { echo "Failed to install Python requirements"; exit 1; }
             
+            # Create .env file with environment variables
+            echo "Creating .env file..."
+            cat <<EOF > .env
+            JIRA_API_TOKEN=${{ secrets.JIRA_API_TOKEN }}
+            TELEX_RETURN_URL=${{ secrets.TELEX_RETURN_URL }}
+            EOF
+            
              # Install Nginx
             sudo apt-get install -y nginx || { echo "Failed to install nginx"; exit 1; }
             
