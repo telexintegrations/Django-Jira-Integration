@@ -19,19 +19,20 @@ class TelexAPITest(generics.GenericAPIView):
                 "descriptions": {
                   "app_name": "Django-Jira Integration",
                   "app_description": "A Telex Interval integration that sends pending and resolved jira tasks for the week",
-                  "app_logo": "https://telex.im/dashboard/applications/generate-json",
+                  "app_logo": "https://plus.unsplash.com/premium_photo-1681426669771-d2113672a49b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                   "app_url": base_url,
                   "background_color": "#fff"
                 },
                 "is_active": 'true',
-                "integration_category": "Monitoring & Logging",
                 "integration_type": "interval",
                 "key_features": [
                   "automation",
                   "send pending or resolved jira issues for the week",
                   "Sends the response to Telex Channel"
                 ],
+                "integration_category": "Monitoring & Logging",
                 "author": "Chukwukodinaka Benjamin",
+                "website":base_url,
                 "settings": [
                   {
                     "label": "categories",
@@ -43,13 +44,7 @@ class TelexAPITest(generics.GenericAPIView):
                     "label": "interval",
                     "type": "text",
                     "required": True,
-                    "default": "*/3 * * * * *"  #schedule it for Saturday night at 11:59 PM(59 23 * * 6).
-                  },
-                  {
-                    "label": "include-logs",
-                    "type": "checkbox",
-                    "required": True,
-                    "default": "True"
+                    "default": "*/15 * * * *"
                   }
                 ],
                 "target_url": "",
@@ -59,6 +54,7 @@ class TelexAPITest(generics.GenericAPIView):
 
         return Response(integration_json, status=200)
 
+#schedule it for Saturday night at 11:59 PM(59 23 * * 6).
 
 class JiraReportAPIView(generics.GenericAPIView):
 
