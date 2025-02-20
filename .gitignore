@@ -2,3 +2,4 @@ myenv/
 venv/
 telex_test_app/migrations/
 .env
+db.sqlite3
