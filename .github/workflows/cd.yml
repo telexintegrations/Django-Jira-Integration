@@ -40,7 +40,7 @@ jobs:
             # Clone repository if it doesn't exist
             if [ ! -d "Telex-test" ]; then
                 echo "First deployment - cloning repository..."
-                git clone https://github.com/Benji918/Telex-test.git || { echo "Failed to clone repository"; exit 1; }
+                git clone https://github.com/telexintegrations/Django-Jira-Integration.git || { echo "Failed to clone repository"; exit 1; }
             fi
             
             cd Telex-test/
