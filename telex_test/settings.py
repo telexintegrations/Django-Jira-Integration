@@ -9,12 +9,14 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import environ
 from pathlib import Path
 import os
+
+env = environ.Env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -147,6 +149,8 @@ SPECTACULAR_SETTINGS = {
 
 JIRA_DOMAIN = 'kodiugos.atlassian.net'
 JIRA_EMAIL = 'kodiugos@gmail.com'
+JIRA_API_TOKEN = env('JIRA_API_TOKEN')
+TELEX_RETURN_URL = env('TELEX_RETURN_URL')
 
 CORS_ALLOWED_ORIGINS = [
     "https://telex.im",
