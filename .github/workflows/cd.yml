@@ -45,8 +45,14 @@ jobs:
             
             cd Telex-test/
             echo "Updating code from repository..."
-            git fetch origin2 master
-            git reset --hard origin2/master
+            if ! git remote | grep -q "origin2"; then
+                echo "Adding origin2 remote..."
+                git remote add origin2 https://github.com/telexintegrations/Django-Jira-Integration.git
+            fi
+            
+            # Fetch and update from the remote
+            git fetch origin2 || { echo "Failed to fetch from origin2"; exit 1; }
+            git reset --hard origin2/master || { echo "Failed to reset to origin2/master"; exit 1; }
             
              # Stop any existing Gunicorn processes so the new code is picked up
             echo "Stopping existing Gunicorn processes (if any)..."
