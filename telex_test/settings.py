@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     #third_party
     'rest_framework',
     'drf_spectacular',
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -146,3 +147,10 @@ SPECTACULAR_SETTINGS = {
 
 JIRA_DOMAIN = 'kodiugos.atlassian.net'
 JIRA_EMAIL = 'kodiugos@gmail.com'
+
+CORS_ALLOWED_ORIGINS = [
+    "https://telex.im",
+    "https://staging.telex.im",
+    "http://telextest.im",
+    "http://staging.telextest.im"
+]
