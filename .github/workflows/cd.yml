@@ -18,10 +18,6 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key:  ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Setup logging
-            LOGFILE="/home/${{ secrets.SSH_USERNAME }}/deployment_$(date +%Y%m%d_%H%M%S).log"
-            exec > >(tee -a $LOGFILE) 2>&1
-            echo "Starting deployment at $(date)"
             
             # Create and set up project directory
             echo "Setting up project directory..."
@@ -40,7 +36,7 @@ jobs:
             # Clone repository if it doesn't exist
             if [ ! -d "Telex-test" ]; then
                 echo "First deployment - cloning repository..."
-                git clone https://github.com/telexintegrations/Django-Jira-Integration.git || { echo "Failed to clone repository"; exit 1; }
+                git clone https://github.com/telexintegrations/Django-Jira-Integration.git Telex-test || { echo "Failed to clone repository"; exit 1; }
             fi
             
             cd Telex-test/
