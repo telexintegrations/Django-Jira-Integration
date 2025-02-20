@@ -45,8 +45,8 @@ jobs:
             
             cd Telex-test/
             echo "Updating code from repository..."
-            git fetch origin master
-            git reset --hard origin/master
+            git fetch origin2 master
+            git reset --hard origin2/master
             
              # Stop any existing Gunicorn processes so the new code is picked up
             echo "Stopping existing Gunicorn processes (if any)..."
