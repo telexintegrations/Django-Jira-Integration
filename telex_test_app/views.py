@@ -11,50 +11,43 @@ class TelexAPITest(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         base_url = request.build_absolute_uri('/').rstrip("/")
         integration_json = {
-              "data": {
-                "date": {
-                  "created_at": "2025-02-18",
-                  "updated_at": "2025-02-18"
-                },
-                "descriptions": {
-                  "app_name": "Django-Jira Integration",
-                  "app_description": "A Telex Interval integration that sends pending and resolved jira tasks for the week",
-                  "app_logo": "https://plus.unsplash.com/premium_photo-1681426669771-d2113672a49b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                  "app_url": base_url,
-                  "background_color": "#fff"
-                },
-                "is_active": 'true',
-                "integration_type": "interval",
-                "key_features": [
-                  "automation",
-                  "send pending or resolved jira issues for the week",
-                  "Sends the response to Telex Channel"
-                ],
-                "integration_category": "Monitoring & Logging",
-                "author": "Chukwukodinaka Benjamin",
-                "website":base_url,
-                "settings": [
-                  {
-                    "label": "categories",
-                    "type": "text",
-                    "required": True,
-                    "default": "automation,business,technology,productivity"
-                  },
-                  {
+          "data": {
+            "date": {
+                "created_at": "2025-02-19",
+                "updated_at": "2025-02-19"
+            },
+            "descriptions": {
+                "app_description": "A Telex Interval integration that sends pending and resolved jira tasks for the week",
+                "app_logo": "https://i.postimg.cc/5Nn52jM9/codex.png",
+                "app_name": "Django-Jira Integration",
+                "app_url": base_url,
+                "background_color": "#151515"
+            },
+            "integration_category": "Monitoring & Logging",
+            "integration_type": "interval",
+            "is_active": True,
+            "author": "Chukwukodinaka Benjamin",
+            "key_features": [
+                "Automatically fetches a new Codewars challenge every day.",
+                "Provides a direct link to the challenge for easy access.",
+                "Encourages continuous skill improvement through daily problem-solving."
+            ],
+            "settings": [
+                {
                     "label": "interval",
                     "type": "text",
                     "required": True,
-                    "default": "*/15 * * * *"
-                  }
-                ],
-                "target_url": "",
-                "tick_url": f"{base_url}/tick"
-              }
+                    "default": "* * * * *"
+                }
+            ],
+            "tick_url": f"{base_url}/tick",
+            "target_url": ""
+          }
         }
 
         return Response(integration_json, status=200)
 
-#schedule it for Saturday night at 11:59 PM(59 23 * * 6).
+
 
 class JiraReportAPIView(generics.GenericAPIView):
 
@@ -62,7 +55,7 @@ class JiraReportAPIView(generics.GenericAPIView):
         jira_reporter = JiraReports(domain=settings.JIRA_DOMAIN, email=settings.JIRA_EMAIL, api_token='ATATT3xFfGF059PYzW7I1qPdY13jeh89F1T3VQQgwA9_BDuDPXw4eX8BMXI8Pl_J5SHkCtZHyi43lp4KaqE6KXCIJH86PBAoggjiwRFSYpG4uA7HpUsaZNMoXtptauqhhAw6MH7zJczRCwqf3uipoVQqzjZ47WQkNRLL2dH5kGhPi5jBc1YVo6U=865F5695')
         try:
             issues = jira_reporter.get_weekly_issues()
-            # print(issues)
+
             # Calculate counts
             pending_count = len(issues["pending"])
             resolved_count = len(issues['resolved'])
@@ -75,26 +68,6 @@ class JiraReportAPIView(generics.GenericAPIView):
                     priority = issue["fields"]["priority"]["name"]
                     priority_counts[status][priority] = priority_counts[status].get(priority, 0) + 1
 
-            # Format response data
-            # response_data = {
-            #     "date_range": {
-            #         "start": (datetime.now() - timedelta(days=7)).strftime('%B %d'),
-            #         "end": datetime.now().strftime('%B %d, %Y')
-            #     },
-            #     "overview": {
-            #         "new_unresolved_issues": pending_count,
-            #         "resolved_issues": resolved_count,
-            #         "total_issues": pending_count + resolved_count
-            #     },
-            #     "priority_breakdown": {
-            #         "pending": jira_reporter.format_priority_counts(priority_counts['pending']),
-            #         "resolved": jira_reporter.format_priority_counts(priority_counts['resolved'])
-            #     },
-            #     "metrics": {
-            #         "resolution_rate": jira_reporter.calculate_resolution_rate(pending_count, resolved_count),
-            #         "workload_index": jira_reporter.calculate_workload_index(pending_count, resolved_count)
-            #     }
-            # }
             data = {
                 'message': f"""
                             Weekly Jira Issues Summary ({(datetime.now() - timedelta(days=7)).strftime('%B %d')} - {datetime.now().strftime('%B %d, %Y')})
@@ -136,3 +109,26 @@ class JiraReportAPIView(generics.GenericAPIView):
 
 
 
+
+
+
+            # Format response data
+            # response_data = {
+            #     "date_range": {
+            #         "start": (datetime.now() - timedelta(days=7)).strftime('%B %d'),
+            #         "end": datetime.now().strftime('%B %d, %Y')
+            #     },
+            #     "overview": {
+            #         "new_unresolved_issues": pending_count,
+            #         "resolved_issues": resolved_count,
+            #         "total_issues": pending_count + resolved_count
+            #     },
+            #     "priority_breakdown": {
+            #         "pending": jira_reporter.format_priority_counts(priority_counts['pending']),
+            #         "resolved": jira_reporter.format_priority_counts(priority_counts['resolved'])
+            #     },
+            #     "metrics": {
+            #         "resolution_rate": jira_reporter.calculate_resolution_rate(pending_count, resolved_count),
+            #         "workload_index": jira_reporter.calculate_workload_index(pending_count, resolved_count)
+            #     }
+            # }
