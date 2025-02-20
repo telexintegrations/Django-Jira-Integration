@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+from typing_extensions import LiteralString
+
 import requests
 from typing import Dict
 
@@ -34,11 +36,12 @@ class JiraReports:
         return results
 
 
-    def format_priority_counts(self, priority_dict: Dict) -> list:
+    def format_priority_counts(self, priority_dict: Dict) -> LiteralString | str:
         """Format priority counts for the API response."""
-        return [{"priority": priority, "count": count}
-                for priority, count in priority_dict.items()]
+        formated_items = [f"Priority -> {priority}: {count}" for priority, count in priority_dict.items()]
 
+
+        return ", ".join(formated_items)
 
     def calculate_resolution_rate(self, pending: int, resolved: int) -> float:
         """Calculate the resolution rate percentage."""
