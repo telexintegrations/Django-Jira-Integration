@@ -7,6 +7,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+      TELEX_RETURN_URL: ${{ secrets.TELEX_RETURN_URL }}
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
