@@ -1,151 +1,115 @@
-import pytest
-from unittest.mock import patch, MagicMock
+import json
 from datetime import datetime, timedelta
-import requests
-from django.test import RequestFactory
-from django.conf import settings
-from rest_framework.test import APITestCase
+from unittest.mock import patch, MagicMock
+
+from django.test import TestCase
+from django.urls import reverse
 from rest_framework import status
+from rest_framework.test import APITestCase
 
-# Assume your view is in app_name.views
-from telex_test_app.views import JiraReportAPIView
+# Import the views and helper functions to be tested
+from telex_test_app import views
+
+# --- Helpers for faking JiraReports behavior ---
+
+# Sample issues returned by JiraReports.get_weekly_issues
+sample_issues = {
+    "pending": [
+         {"fields": {"priority": {"name": "High"}}},
+         {"fields": {"priority": {"name": "Medium"}}}
+    ],
+    "resolved": [
+         {"fields": {"priority": {"name": "Low"}}}
+    ]
+}
+
+def fake_format_priority_counts(priority_counts):
+    # Simply return a string representation of the counts.
+    return ", ".join([f"{k}: {v}" for k, v in priority_counts.items()])
+
+def fake_calculate_resolution_rate(pending, resolved):
+    total = pending + resolved
+    return f"{(resolved / total * 100):.2f}%" if total > 0 else "N/A"
+
+def fake_calculate_workload_index(pending, resolved):
+    return pending + resolved
+
+class FakeJiraReports:
+    def __init__(self, domain, email, api_token):
+        self.domain = domain
+        self.email = email
+        self.api_token = api_token
+
+    def get_weekly_issues(self):
+        return sample_issues
+
+    def format_priority_counts(self, counts):
+        return fake_format_priority_counts(counts)
+
+    def calculate_resolution_rate(self, pending, resolved):
+        return fake_calculate_resolution_rate(pending, resolved)
+
+    def calculate_workload_index(self, pending, resolved):
+        return fake_calculate_workload_index(pending, resolved)
+
+# --- Tests for generate_jira_report ---
+
+@patch('telex_test_app.views.JiraReports', new=FakeJiraReports)
+class GenerateJiraReportTests(TestCase):
+    def test_generate_jira_report_success(self):
+        """
+        Test that generate_jira_report returns a success payload
+        with the expected structure.
+        """
+        result = views.generate_jira_report()
+        self.assertEqual(result['status'], 'success')
+        self.assertIn("Weekly Jira Issues Summary", result['message'])
+        self.assertEqual(result['username'], "Django-Jira Integration")
+        self.assertEqual(result['event_name'], "Telex-Integration")
 
 
-class TestJiraReportAPIView(APITestCase):
-    def setUp(self):
-        self.factory = RequestFactory()
-        self.view = JiraReportAPIView.as_view()
-        self.request = self.factory.get('jira-report/')
+# --- Tests for process_jira_report ---
+@patch('telex_test_app.views.requests.post')
+@patch('telex_test_app.views.JiraReports', new=FakeJiraReports)
+class ProcessJiraReportTests(TestCase):
+    def test_process_jira_report_calls_requests_post(self, mock_post):
+        """
+        Test that process_jira_report calls requests.post with the correct parameters.
+        """
+        # Call the function
+        views.process_jira_report()
+        # Import settings to compare the URL
+        from django.conf import settings
+        expected_data = views.generate_jira_report()
+        mock_post.assert_called_once_with(url=settings.TELEX_RETURN_URL, json=expected_data)
 
-        # Mock data
-        self.mock_issues = {
-            "pending": [
-                {"fields": {"priority": {"name": "High"}}},
-                {"fields": {"priority": {"name": "High"}}},
-                {"fields": {"priority": {"name": "Medium"}}}
-            ],
-            "resolved": [
-                {"fields": {"priority": {"name": "Low"}}},
-                {"fields": {"priority": {"name": "Medium"}}}
-            ]
-        }
+# --- Tests for the API Views ---
+@patch('telex_test_app.views.process_jira_report')
+class JiraReportAPIViewTests(APITestCase):
+    def test_post_jira_report_api_view(self, mock_process_jira_report):
+        """
+        Test the JiraReportAPIView endpoint to ensure it returns 202 and triggers processing.
+        """
+        # Assume that you have a URL pattern named 'jira-report'
+        url = reverse('jira-report')
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+        self.assertEqual(response.data, {"status": "accepted"})
+        mock_process_jira_report.assert_called_once()
 
-    @patch('telex_test_app.views.JiraReports')
-    def test_successful_report_generation(self, MockJiraReports):
-        # Configure mock
-        mock_jira_instance = MockJiraReports.return_value
-        mock_jira_instance.get_weekly_issues.return_value = self.mock_issues
-        mock_jira_instance.format_priority_counts.return_value = {"High": 2, "Medium": 1}
-        mock_jira_instance.calculate_resolution_rate.return_value = "40%"
-        mock_jira_instance.calculate_workload_index.return_value = "Moderate"
+class TelexAPITestViewTests(APITestCase):
+    def test_get_telex_api_test(self):
+        """
+        Test the TelexAPITest GET endpoint returns the expected JSON structure.
+        """
 
-        # Execute view
-        response = self.view(self.request)
-
-        # Assertions
+        url = reverse('integration-json')
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['overview']['new_unresolved_issues'], 3)
-        self.assertEqual(response.data['overview']['resolved_issues'], 2)
-        self.assertEqual(response.data['overview']['total_issues'], 5)
-        self.assertIn('date_range', response.data)
-        self.assertIn('priority_breakdown', response.data)
-        self.assertIn('metrics', response.data)
-
-        # Verify the mock was called with correct params
-        MockJiraReports.assert_called_once_with(
-            domain=settings.JIRA_DOMAIN,
-            email=settings.JIRA_EMAIL,
-            api_token=settings.JIRA_API_TOKEN
-        )
-        mock_jira_instance.get_weekly_issues.assert_called_once()
-
-    @patch('telex_test_app.views.JiraReports')
-    def test_jira_request_exception_handling(self, MockJiraReports):
-        # Configure mock to raise exception
-        mock_jira_instance = MockJiraReports.return_value
-        mock_jira_instance.get_weekly_issues.side_effect = requests.exceptions.RequestException("Connection error")
-
-        # Execute view
-        response = self.view(self.request)
-
-        # Assertions
-        self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
-        self.assertIn('error', response.data)
-        self.assertIn('Connection error', response.data['error'])
-
-    @patch('telex_test_app.views.JiraReports')
-    def test_general_exception_handling(self, MockJiraReports):
-        # Configure mock to raise exception
-        mock_jira_instance = MockJiraReports.return_value
-        mock_jira_instance.get_weekly_issues.side_effect = ValueError("Invalid data format")
-
-        # Execute view
-        response = self.view(self.request)
-
-        # Assertions
-        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        self.assertIn('error', response.data)
-        self.assertIn('Invalid data format', response.data['error'])
-
-    @patch('telex_test_app.views.JiraReports')
-    def test_date_range_calculation(self, MockJiraReports):
-        # Configure mock
-        mock_jira_instance = MockJiraReports.return_value
-        mock_jira_instance.get_weekly_issues.return_value = self.mock_issues
-        mock_jira_instance.format_priority_counts.return_value = {}
-
-        # Freeze time for testing
-        current_date = datetime(2023, 5, 15)
-        start_date = current_date - timedelta(days=7)
-
-        with patch('telex_test_app.views.datetime') as mock_datetime:
-            mock_datetime.now.return_value = current_date
-            mock_datetime.timedelta = timedelta
-
-            # Execute view
-            response = self.view(self.request)
-
-            # Assertions
-            self.assertEqual(response.data['date_range']['start'], start_date.strftime('%B %d'))
-            self.assertEqual(response.data['date_range']['end'], current_date.strftime('%B %d, %Y'))
-
-    @patch('telex_test_app.views.JiraReports')
-    def test_priority_breakdown_calculation(self, MockJiraReports):
-        # Configure mock
-        mock_jira_instance = MockJiraReports.return_value
-        mock_jira_instance.get_weekly_issues.return_value = self.mock_issues
-
-        # Custom mock implementation for format_priority_counts
-        def mock_format_priority(counts):
-            return counts
-
-        mock_jira_instance.format_priority_counts.side_effect = mock_format_priority
-
-        # Execute view
-        response = self.view(self.request)
-
-        # Assertions
-        self.assertEqual(response.data['priority_breakdown']['pending'], {'High': 2, 'Medium': 1})
-        self.assertEqual(response.data['priority_breakdown']['resolved'], {'Low': 1, 'Medium': 1})
-
-        # Verify format_priority_counts was called twice (once for pending, once for resolved)
-        self.assertEqual(mock_jira_instance.format_priority_counts.call_count, 2)
-
-    @patch('telex_test_app.views.JiraReports')
-    def test_metrics_calculation(self, MockJiraReports):
-        # Configure mock
-        mock_jira_instance = MockJiraReports.return_value
-        mock_jira_instance.get_weekly_issues.return_value = self.mock_issues
-        mock_jira_instance.calculate_resolution_rate.return_value = "40%"
-        mock_jira_instance.calculate_workload_index.return_value = "Moderate"
-
-        # Execute view
-        response = self.view(self.request)
-
-        # Assertions
-        self.assertEqual(response.data['metrics']['resolution_rate'], "40%")
-        self.assertEqual(response.data['metrics']['workload_index'], "Moderate")
-
-        # Verify calculation methods were called with correct arguments
-        mock_jira_instance.calculate_resolution_rate.assert_called_once_with(3, 2)
-        mock_jira_instance.calculate_workload_index.assert_called_once_with(3, 2)
+        data = response.data.get("data")
+        self.assertIsNotNone(data)
+        # Check that expected keys are present
+        self.assertIn("descriptions", data)
+        self.assertIn("tick_url", data)
+        # Check that the base URL is correctly formed in tick_url
+        self.assertTrue(data["tick_url"].endswith("/tick"))
