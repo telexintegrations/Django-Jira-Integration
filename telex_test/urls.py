@@ -25,7 +25,7 @@ from drf_spectacular.views import (
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('integration-json/', TelexAPITest.as_view(), name='integration-json'),
-    path('jira-report/', JiraReportAPIView.as_view(), name='jira-report'),
+    path('tick/', JiraReportAPIView.as_view(), name='jira-report'),
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
     path('swagger/', SpectacularSwaggerView.as_view(), name='swagger-ui'),
 ]
