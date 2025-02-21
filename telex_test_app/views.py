@@ -61,21 +61,21 @@ def generate_jira_report():
             api_token=settings.JIRA_API_TOKEN
         )
 
-        # Get weekly issues (now synchronous)
+
         issues = jira_reporter.get_weekly_issues()
 
-        # Calculate counts
+
         pending_count = len(issues.get("pending", []))
         resolved_count = len(issues.get("resolved", []))
 
-        # Calculate priority distribution
+
         priority_counts = {"pending": {}, "resolved": {}}
         for status in ["pending", "resolved"]:
             for issue in issues.get(status, []):
                 priority = issue["fields"]["priority"]["name"]
                 priority_counts[status][priority] = priority_counts[status].get(priority, 0) + 1
 
-        # Build the report message
+
         message = f"""
 Weekly Jira Issues Summary ({(datetime.now() - timedelta(days=7)).strftime('%B %d')} - {datetime.now().strftime('%B %d, %Y')})
 
@@ -116,7 +116,6 @@ def process_jira_report():
     Processes the Jira report and sends it to the Telex webhook.
     """
     data = generate_jira_report()
-    print(data)
     try:
         requests.post(
             url= settings.TELEX_RETURN_URL,
