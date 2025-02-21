@@ -160,3 +160,5 @@ CORS_ALLOWED_ORIGINS = [
     "http://telextest.im",
     "http://staging.telextest.im"
 ]
+
+APPEND_SLASH = False
