@@ -35,9 +35,11 @@ class TelexAPITest(generics.GenericAPIView):
                 "settings": [
                   {
                     "label": "interval",
-                    "type": "text",
+                    "type": "dropdown",
                     "required": True,
-                    "default": "1 * * * *"
+                    "default": "* * * * *",
+                    "description": "Select different intervals to send message to telex channel",
+                    "options": ["* * * * *", "59 11 * * 6", "1 * * * *"]
                   },
                   {
                     "label": "telex_channel_webhook",
