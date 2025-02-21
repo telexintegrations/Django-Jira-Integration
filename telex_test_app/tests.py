@@ -1,5 +1,3 @@
-import json
-from datetime import datetime, timedelta
 from unittest.mock import patch, MagicMock
 
 from django.test import TestCase
@@ -7,12 +5,9 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-# Import the views and helper functions to be tested
 from telex_test_app import views
 
-# --- Helpers for faking JiraReports behavior ---
 
-# Sample issues returned by JiraReports.get_weekly_issues
 sample_issues = {
     "pending": [
          {"fields": {"priority": {"name": "High"}}},
@@ -24,7 +19,6 @@ sample_issues = {
 }
 
 def fake_format_priority_counts(priority_counts):
-    # Simply return a string representation of the counts.
     return ", ".join([f"{k}: {v}" for k, v in priority_counts.items()])
 
 def fake_calculate_resolution_rate(pending, resolved):
@@ -52,7 +46,7 @@ class FakeJiraReports:
     def calculate_workload_index(self, pending, resolved):
         return fake_calculate_workload_index(pending, resolved)
 
-# --- Tests for generate_jira_report ---
+
 
 @patch('telex_test_app.views.JiraReports', new=FakeJiraReports)
 class GenerateJiraReportTests(TestCase):
@@ -68,7 +62,7 @@ class GenerateJiraReportTests(TestCase):
         self.assertEqual(result['event_name'], "Telex-Integration")
 
 
-# --- Tests for process_jira_report ---
+
 @patch('telex_test_app.views.requests.post')
 @patch('telex_test_app.views.JiraReports', new=FakeJiraReports)
 class ProcessJiraReportTests(TestCase):
@@ -78,7 +72,6 @@ class ProcessJiraReportTests(TestCase):
         """
         # Call the function
         views.process_jira_report()
-        # Import settings to compare the URL
         from django.conf import settings
         expected_data = views.generate_jira_report()
         mock_post.assert_called_once_with(url=settings.TELEX_RETURN_URL, json=expected_data)
@@ -90,7 +83,7 @@ class JiraReportAPIViewTests(APITestCase):
         """
         Test the JiraReportAPIView endpoint to ensure it returns 202 and triggers processing.
         """
-        # Assume that you have a URL pattern named 'jira-report'
+
         url = reverse('jira-report')
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)

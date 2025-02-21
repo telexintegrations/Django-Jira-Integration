@@ -28,9 +28,8 @@ class TelexAPITest(generics.GenericAPIView):
             "is_active": True,
             "author": "Chukwukodinaka Benjamin",
             "key_features": [
-                "Automatically fetches a new Codewars challenge every day.",
-                "Provides a direct link to the challenge for easy access.",
-                "Encourages continuous skill improvement through daily problem-solving."
+                "Automatically fetches Jira issues(pending and resolved) for the week.",
+                "Enhances team productivity."
             ],
             "settings": [
                 {
