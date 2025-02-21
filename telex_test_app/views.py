@@ -38,6 +38,12 @@ class TelexAPITest(generics.GenericAPIView):
                     "type": "text",
                     "required": True,
                     "default": "1 * * * *"
+                  },
+                  {
+                    "label": "telex_channel_webhook",
+                    "type": "text",
+                    "required": True,
+                    "default": " "
                   }
                 ],
                 "target_url": "  ",
