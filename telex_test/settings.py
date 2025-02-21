@@ -29,6 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['40.83.174.214', '127.0.0.1', 'django-jira-integration.onrender.com']
 
+APPEND_SLASH = False
 
 # Application definition
 
@@ -161,4 +162,3 @@ CORS_ALLOWED_ORIGINS = [
     "http://staging.telextest.im"
 ]
 
-APPEND_SLASH = False
