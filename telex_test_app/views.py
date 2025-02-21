@@ -47,7 +47,7 @@ class TelexAPITest(generics.GenericAPIView):
                   }
                 ],
                 "target_url": "  ",
-                "tick_url": f"{base_url}/tick"
+                "tick_url": f"{base_url}/tick/"
             }
 
         }
