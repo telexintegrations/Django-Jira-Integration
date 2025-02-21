@@ -11,37 +11,39 @@ class TelexAPITest(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         base_url = request.build_absolute_uri('/').rstrip("/")
         integration_json = {
-          "data": {
-            "date": {
-                "created_at": "2025-02-19",
-                "updated_at": "2025-02-19"
-            },
-            "descriptions": {
-                "app_description": "A Telex Interval integration that sends pending and resolved jira tasks for the week",
-                "app_logo": "https://i.postimg.cc/5Nn52jM9/codex.png",
-                "app_name": "Django-Jira Integration",
-                "app_url": base_url,
-                "background_color": "#151515"
-            },
-            "integration_category": "Monitoring & Logging",
-            "integration_type": "interval",
-            "is_active": True,
-            "author": "Chukwukodinaka Benjamin",
-            "key_features": [
-                "Automatically fetches Jira issues(pending and resolved) for the week.",
-                "Enhances team productivity."
-            ],
-            "settings": [
-                {
+
+            "data": {
+                "date": {
+                  "created_at": "2025-02-21",
+                  "updated_at": "2025-02-21"
+                },
+                "descriptions": {
+                  "app_name": "Django-Jira Integration",
+                  "app_description": "A Telex Interval integration that sends pending and resolved jira tasks for the week",
+                  "app_logo": "https://i.postimg.cc/5Nn52jM9/codex.png",
+                  "app_url": base_url,
+                  "background_color": "#fff"
+                },
+                "is_active": True,
+                "integration_type": "interval",
+                "integration_category": "Monitoring & Logging",
+                "key_features": [
+                  "Automatically fetches Jira issues(pending and resolved) for the week",
+                  "Enhances team productivity"
+                ],
+                "author": "Chukwukodinaka Benjamin",
+                "settings": [
+                  {
                     "label": "interval",
                     "type": "text",
                     "required": True,
-                    "default": "* * * * *"
-                }
-            ],
-            "tick_url": f"{base_url}/tick",
-            "target_url": ""
-          }
+                    "default": "1 * * * *"
+                  }
+                ],
+                "target_url": "  ",
+                "tick_url": f"{base_url}/tick"
+            }
+
         }
 
         return Response(integration_json, status=200)
