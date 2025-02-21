@@ -19,11 +19,17 @@ This is a telex integration that uses the JIRA API endpoint to pull issues from 
 jira issues to telex. This process will enable teams to have an overview of pending and resolved issues from the past week, thus
 enhancing productivity
 
+Architectural diagram
+![](https://github.com/telexintegrations/Django-Jira-Integration/blob/master/assets/_-%20visual%20selection.png)
 
 1. The first step is to go [altlassian website](https://id.atlassian.com/manage-profile/security/api-tokens) to generate your API token
+![](https://github.com/telexintegrations/Django-Jira-Integration/blob/master/assets/img_1.png)
+
 2. Next, is to use the generated API token in your DRF application to pull the jira issues from the jira board
 3. Go to [Telex website](https://telex.im) create and login to your account. Create a telex channel
-4. Click on your created channel to copy the telex webhook url. 
+4. Click on your created channel to copy the telex webhook url.
+![](https://github.com/telexintegrations/Django-Jira-Integration/blob/master/assets/img_2.png)
+![](https://github.com/telexintegrations/Django-Jira-Integration/blob/master/assets/img_3.png)
 
 ## Prerequisites
 
