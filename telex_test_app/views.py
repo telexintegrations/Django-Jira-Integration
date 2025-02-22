@@ -20,7 +20,7 @@ class TelexAPITest(generics.GenericAPIView):
                 "descriptions": {
                   "app_name": "Django-Jira Integration",
                   "app_description": "A Telex Interval integration that sends pending and resolved jira tasks for the week",
-                  "app_logo": "https://i.postimg.cc/5Nn52jM9/codex.png",
+                  "app_logo": "https://cdn.logojoy.com/wp-content/uploads/20220329171603/dating-app-logo-example.jpg",
                   "app_url": base_url,
                   "background_color": "#fff"
                 },
