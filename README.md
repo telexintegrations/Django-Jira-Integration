@@ -110,6 +110,32 @@ This project uses drf-spectacular for API documentation.
    python manage.py test 
    ```
 
+### Using Curl to test the integration.json endpoint
+```bash
+curl --location 'https://django-jira-integration.onrender.com/integration.json/' | json_pp
+
+```
+
+
+### Using Curl to test the tick endpoint
+```bash
+curl --location 'https://django-jira-integration.onrender.com/tick' \
+--header 'Content-Type: application/json' \
+--data '{
+    "channel_id": "01952d3a-2bbc-76f6-ac5c-931ece485e1b",
+    "return_url": "https://ping.telex.im/v1/return/01952d3a-2bbc-76f6-ac5c-931ece485e1b",
+    "settings": [
+      {
+        "label": "interval",
+        "type": "dropdown",
+        "required": True,
+        "default": "* * * * *",
+        "description": "Select different intervals to send message to telex channel",
+        "options": ["* * * * *", "59 11 * * 6", "1 * * * *"]
+      }
+    ]
+}'
+```
 
 ## Deployment
 
